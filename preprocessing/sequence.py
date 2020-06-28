@@ -29,8 +29,6 @@ timer.start()
 train = pd.read_pickle(TRAIN_FILE)
 test = pd.read_pickle(TEST_FILE)
 
-train = train.astype({'time': 'str', 'click_times': 'str'})
-test = test.astype({'time': 'str', 'click_times': 'str'})
 timer.stop()
 # -------------------------------------------------------------------------------------------------
 print('Make rank column base on time')
@@ -46,6 +44,10 @@ test['rn'] = test \
     .groupby('user_id') \
     .cumcount() + 1
 test.sort_values(['user_id', 'rn'], inplace=True)
+
+train = train.astype({'time': 'str', 'click_times': 'str'})
+test = test.astype({'time': 'str', 'click_times': 'str'})
+
 timer.stop()
 # -------------------------------------------------------------------------------------------------
 print('Create id sequence features for each user...')
