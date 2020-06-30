@@ -61,3 +61,37 @@ test_target_encode = test_target_encode.groupby('user_id').mean().reset_index(dr
 print(f'\nSave feature to `{TRAIN_GENDER_ENCODED_FEAT}` and `{TEST_GENDER_ENCODED_FEAT}`')
 train_target_encode.to_pickle(TRAIN_GENDER_ENCODED_FEAT)
 test_target_encode.to_pickle(TEST_GENDER_ENCODED_FEAT)
+# -------------------------------------------------------------------------------------------------
+print('Generate target encoding features for age')
+train_target_encode = train['user_id']
+test_target_encode = test['user_id']
+
+for cat in FEAT_TO_GENERATE:
+    for i in range(1, 11):
+        print(f'Encoding age = {i}...')
+        target_sr = (train['age'] == i).astype('uint8')
+        timer.start()
+        stack_train, stack_test = kfold_target_mean(kfold, train[cat], target_sr, test[cat])
+        timer.stop()
+        temp = pd.Series(stack_train, name=f'{cat}_target_mean_{i}')
+        train_target_encode = pd.concat([train_target_encode, temp], axis=1)
+        temp = pd.Series(stack_test, name=f'{cat}_target_mean_{i}')
+        test_target_encode = pd.concat([test_target_encode, temp], axis=1)
+
+target_sr = train['age'] - 1
+
+for cat in FEAT_TO_GENERATE:
+    timer.start()
+    stack_train, stack_test = kfold_target_mean(kfold, train[cat], target_sr, test[cat])
+    timer.stop()
+    temp = pd.Series(stack_train, name=f'{cat}_target_mean')
+    train_target_encode = pd.concat([train_target_encode, temp], axis=1)
+    temp = pd.Series(stack_test, name=f'{cat}_target_mean')
+    test_target_encode = pd.concat([test_target_encode, temp], axis=1)
+
+train_target_encode = train_target_encode.groupby('user_id').mean().reset_index()
+test_target_encode = test_target_encode.groupby('user_id').mean().reset_index()
+
+print(f'\nSave feature to `{TRAIN_AGE_ENCODED_FEAT}` and `{TEST_AGE_ENCODED_FEAT}`')
+train_target_encode.to_pickle(TRAIN_AGE_ENCODED_FEAT)
+test_target_encode.to_pickle(TEST_AGE_ENCODED_FEAT)
