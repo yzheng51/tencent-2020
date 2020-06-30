@@ -42,7 +42,7 @@ print('Loading data and preprocessing...')
 timer.start()
 train = pd.read_pickle(TRAIN_SEQ_FILE)
 test = pd.read_pickle(TEST_SEQ_FILE)
-user = pd.read_csv(LABEL_FILE)
+user = pd.read_csv(LABEL_FILE, dtype=dtype)
 
 label_gender = user.gender.values - 1
 label_age = user.age.values - 1
