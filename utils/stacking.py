@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.metrics import roc_auc_score, accuracy_score, log_loss
+from utils.encoder import target_encode
 
 
 def kfold_stack_binary(kfold, classifier, x_train, y_train, x_test):
@@ -81,6 +82,45 @@ def kfold_stack_multi(output_size, kfold, classifier, x_train, y_train, x_test):
         )
         stack_train[valid_idx] = valid_score
         stack_test += test_score
+    stack_test /= 5
+
+    return stack_train, stack_test
+
+
+def kfold_target_mean(
+    kfold, train_sr, target_sr, test_sr, min_samples_leaf=1, smoothing=1, noise_level=0
+):
+    """k fold cv to create target encoding feature
+
+    Args:
+        kfold (sklearn.model_selection.StratifiedKFold): k fold spliter
+        train_sr (pd.Series): train categorical feature
+        target_sr (pd.Series): label
+        test_sr (pd.Series): test categorical feature
+        min_samples_leaf (int, optional): minimum samples to take category average
+            into account. Defaults to 1.
+        smoothing (int, optional): smoothing effect to balance categorical average
+            vs prior. Defaults to 1.
+        noise_level (int, optional): mean of the gaussian distribution. Defaults to 0.
+
+    Returns:
+        [type]: [description]
+    """
+    print(f'Target encoding {train_sr.name} with {target_sr.name}...')
+    stack_train = np.zeros(train_sr.shape[0])
+    stack_test = np.zeros(test_sr.shape[0])
+
+    for train_idx, valid_idx in kfold.split(train_sr, target_sr):
+        val_tf = target_encode(
+            train_sr=train_sr[train_idx], target_sr=target_sr[train_idx], test_sr=train_sr[valid_idx],
+            min_samples_leaf=min_samples_leaf, smoothing=smoothing, noise_level=noise_level
+        )
+        test_tf = target_encode(
+            train_sr=train_sr[train_idx], target_sr=target_sr[train_idx], test_sr=test_sr,
+            min_samples_leaf=min_samples_leaf, smoothing=smoothing, noise_level=noise_level
+        )
+        stack_train[valid_idx] = val_tf
+        stack_test += test_tf
     stack_test /= 5
 
     return stack_train, stack_test
