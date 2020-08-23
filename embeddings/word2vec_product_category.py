@@ -8,7 +8,7 @@ from utils.callback import MyLossCalculator
 # -------------------------------------------------------------------------------------------------
 # word2vec hyper parameters
 SIZE = 128
-WINDOW = 10
+WINDOW = 50
 MIN_COUNT = 2
 
 seed = 2020
