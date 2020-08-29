@@ -12,7 +12,7 @@ class TransformerLSTMSingleId(torch.nn.Module):
         self.id_embed = torch.nn.Embedding.from_pretrained(id_embed)
 
         # lstm layer initialization
-        self.rnn = torch.nn.LSTM(
+        self.rnn = torch.nn.GRU(
             input_size=n_embed, hidden_size=n_lstm_hid, num_layers=n_lstm_layer, batch_first=True,
             bidirectional=lstm_bidirect, dropout=lstm_dropout
         )
@@ -74,15 +74,15 @@ class TransformerLSTMTripleId(torch.nn.Module):
         self.id3_embed = torch.nn.Embedding.from_pretrained(id3_embed)
 
         # lstm layer initialization
-        self.rnn1 = torch.nn.LSTM(
+        self.rnn1 = torch.nn.GRU(
             input_size=n_embed, hidden_size=n_lstm_hid, num_layers=n_lstm_layer, batch_first=True,
             bidirectional=lstm_bidirect, dropout=lstm_dropout
         )
-        self.rnn2 = torch.nn.LSTM(
+        self.rnn2 = torch.nn.GRU(
             input_size=n_embed, hidden_size=n_lstm_hid, num_layers=n_lstm_layer, batch_first=True,
             bidirectional=lstm_bidirect, dropout=lstm_dropout
         )
-        self.rnn3 = torch.nn.LSTM(
+        self.rnn3 = torch.nn.GRU(
             input_size=n_embed, hidden_size=n_lstm_hid, num_layers=n_lstm_layer, batch_first=True,
             bidirectional=lstm_bidirect, dropout=lstm_dropout
         )
